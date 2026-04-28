@@ -127,31 +127,44 @@ const styles = StyleSheet.create({
     backgroundColor: "#F4FBFF",
     padding: 20,
     borderRadius: 20,
+    alignContent:"center",
+    width:"auto"
   },
+
+  // titulo
   title: {
-    fontSize: 22,
-    fontWeight: "bold",
+    fontSize: 26,
     color: "#4A90E2",
     marginBottom: 20,
     textAlign: "center",
+    fontFamily: "Pacifico_400Regular", // 🔥 aquí
   },
+
+  // 🧠 INPUTS LIMPIOS
   input: {
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
-    padding: 12,
+    padding: 14,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: "#D6ECFF",
+    fontFamily: "Poppins_400Regular", // 🔥 aquí
+    fontSize: 14,
   },
+
+  // 🔘 BOTÓN
   button: {
     backgroundColor: "#6EC6FF",
     padding: 15,
     borderRadius: 15,
     marginTop: 10,
   },
+
+  // 🧾 TEXTO BOTÓN
   buttonText: {
     color: "white",
     textAlign: "center",
-    fontWeight: "bold",
+    fontFamily: "Poppins_400Regular", // 🔥 aquí
+    fontSize: 16,
   },
 });
