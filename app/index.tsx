@@ -1,13 +1,13 @@
-
-import RegisterPage from "@/views/Resgister";
+import RegisterPage from "@/app/register";
+import LoginPage from "@/app/login";
 import { Text, View } from "react-native";
 const ConatinerApp = () => {
 
   return (
     <View>
       <Text>
-        {/* <LoginPage/> */}
-        <RegisterPage />
+        <LoginPage/>
+        {/* <RegisterPage /> */}
       </Text>
 
     </View>

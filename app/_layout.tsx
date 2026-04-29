@@ -1,10 +1,8 @@
 import * as NavigationBar from 'expo-navigation-bar';
-import { Slot } from "expo-router";
+import { Stack } from "expo-router"; // 🔥 CAMBIO CLAVE
 import { StatusBar } from 'expo-status-bar';
-import { Platform, Text, View } from "react-native";
-
-
 import { useEffect } from "react";
+import { Platform, Text, View } from "react-native";
 
 // 🔤 Fonts
 import { Pacifico_400Regular } from "@expo-google-fonts/pacifico";
@@ -34,12 +32,15 @@ const RootLayout = () => {
   }
 
   return (
-    
-      <View style={{ flex: 1 }}>
-        <Slot />
-        <StatusBar style="dark" />
-      </View>
-   
+    <>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: "fade_from_bottom", // 💙 AQUÍ ESTÁ LA MAGIA
+        }}
+      />
+      <StatusBar style="dark" />
+    </>
   );
 };
 

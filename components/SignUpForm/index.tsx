@@ -1,7 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useState } from "react";
 import {
   Alert,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -9,11 +12,11 @@ import {
   View
 } from "react-native";
 
+//estructura del usuario (modelo de datos)
 interface User {
   name: string;
   lastName: string;
   yearOfBirth: string;
-  age: string;
   phone: string;
   email: string;
   password: string;
@@ -21,33 +24,67 @@ interface User {
 
 const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
-  const [form, setForm] = useState<User>({
+  //Estado inicial del formulario, todos los campos vacios
+  const initialForm: User = {
     name: "",
     lastName: "",
     yearOfBirth: "",
-    age: "",
     phone: "",
     email: "",
     password: "",
-  });
+  };
+  //estado principal del formulario
+  const [form, setForm] = useState<User>(initialForm);
+  
 
+  //controla si se muestra u oculta la contraseña
+  const [showPassword, setShowPassword] = useState(false);
+
+  //controla la visibilidad del calendario
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  //guarda temporalmente la fecha seleccionada
+  const [date, setDate] = useState(new Date());
+
+  //toma los cambios y los almacena en el estado
   const handleChange = (key: keyof User, value: string) => {
     setForm({ ...form, [key]: value });
   };
 
+  //convierte a numero los campos como telefono
   const onlyNumbers = (text: string) => text.replace(/[^0-9]/g, "");
 
+  //maneja el cambio de fecha desde el calendario
+  const onChangeDate = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false); //cierra el calendario
+
+    if (selectedDate) {
+      setDate(selectedDate);
+
+      //formatea la fecha a YYYY-MM-DD
+      const formatted = selectedDate.toISOString().split("T")[0];
+
+      //guarda la fecha en el formulario
+      handleChange("yearOfBirth", formatted);
+    }
+  };
+
   const handleRegister = async () => {
+
+    //valida que los campos obligatorios no estén vacíos
     if (!form.name || !form.email || !form.password) {
       Alert.alert("Error", "Completa los campos obligatorios");
       return;
     }
 
+    //maneja el guardado de datos en AsyncStorage
     try {
       await AsyncStorage.setItem("user", JSON.stringify(form));
 
       Alert.alert("💙 Registro exitoso", "Bienvenida a Amara Baby");
+      setForm(initialForm)
 
+      //callback opcional para refrescar datos en la pantalla padre
       onSuccess?.();
 
     } catch (error) {
@@ -60,61 +97,108 @@ const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
       <Text style={styles.title}>Crear cuenta</Text>
 
-      <TextInput
-        placeholder="Nombre"
-        value={form.name}
-        onChangeText={(text) => handleChange("name", text)}
-        style={styles.input}
-      />
+      {/* Nombre */}
+      <View style={styles.inputContainer}>
+        <Ionicons name="person-outline" size={20} color="#4A90E2" />
+        <TextInput
+          placeholder="Nombre"
+          value={form.name}
+          onChangeText={(text) => handleChange("name", text)}
+          style={styles.input}
+        />
+      </View>
 
-      <TextInput
-        placeholder="Apellido"
-        value={form.lastName}
-        onChangeText={(text) => handleChange("lastName", text)}
-        style={styles.input}
-      />
+      {/* Apellido */}
+      <View style={styles.inputContainer}>
+        <Ionicons name="person-outline" size={20} color="#4A90E2" />
+        <TextInput
+          placeholder="Apellido"
+          value={form.lastName}
+          onChangeText={(text) => handleChange("lastName", text)}
+          style={styles.input}
+        />
+      </View>
 
-      <TextInput
-        placeholder="Fecha de nacimiento (YYYY-MM-DD)"
-        value={form.yearOfBirth}
-        onChangeText={(text) => handleChange("yearOfBirth", text)}
-        style={styles.input}
-      />
+      {/* Fecha con calendario */}
+      <View style={styles.inputContainer}>
+        <Ionicons name="calendar-outline" size={20} color="#4A90E2" />
 
-      <TextInput
-        placeholder="Edad"
-        keyboardType="numeric"
-        value={form.age}
-        onChangeText={(text) => handleChange("age", onlyNumbers(text))}
-        style={styles.input}
-      />
+        {/* este Touchable abre el calendario */}
+        <TouchableOpacity
+          style={{ flex: 1, padding: 12 }}
+          onPress={() => setShowDatePicker(true)}
+        >
+          <Text
+            style={{
+              fontFamily: "Poppins_400Regular",
+              color: form.yearOfBirth ? "#000" : "#999",
+            }}
+          >
+            {form.yearOfBirth || "Fecha de nacimiento"}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-      <TextInput
-        placeholder="Teléfono"
-        keyboardType="numeric"
-        value={form.phone}
-        onChangeText={(text) => handleChange("phone", onlyNumbers(text))}
-        style={styles.input}
-      />
+      {/* Teléfono */}
+      <View style={styles.inputContainer}>
+        <Ionicons name="call-outline" size={20} color="#4A90E2" />
+        <TextInput
+          placeholder="Teléfono"
+          keyboardType="numeric"
+          value={form.phone}
+          onChangeText={(text) => handleChange("phone", onlyNumbers(text))}
+          style={styles.input}
+        />
+      </View>
 
-      <TextInput
-        placeholder="Correo"
-        value={form.email}
-        onChangeText={(text) => handleChange("email", text)}
-        style={styles.input}
-      />
+      {/* Email */}
+      <View style={styles.inputContainer}>
+        <Ionicons name="mail-outline" size={20} color="#4A90E2" />
+        <TextInput
+          placeholder="Correo"
+          value={form.email}
+          onChangeText={(text) => handleChange("email", text)}
+          style={styles.input}
+        />
+      </View>
 
-      <TextInput
-        placeholder="Contraseña"
-        secureTextEntry
-        value={form.password}
-        onChangeText={(text) => handleChange("password", text)}
-        style={styles.input}
-      />
+      {/* Password */}
+      <View style={styles.inputContainer}>
+        <Ionicons name="lock-closed-outline" size={20} color="#4A90E2" />
 
+        <TextInput
+          placeholder="Contraseña"
+          secureTextEntry={!showPassword}
+          value={form.password}
+          onChangeText={(text) => handleChange("password", text)}
+          style={styles.input}
+        />
+
+        {/* botón para mostrar/ocultar contraseña */}
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <Ionicons
+            name={showPassword ? "eye-off" : "eye"}
+            size={20}
+            color="#4A90E2"
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Botón de registro */}
       <TouchableOpacity onPress={handleRegister} style={styles.button}>
         <Text style={styles.buttonText}>Registrarme</Text>
       </TouchableOpacity>
+
+      {/* componente de calendario */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={onChangeDate}
+          maximumDate={new Date()} //evita fechas futuras
+        />
+      )}
 
     </View>
   );
@@ -127,32 +211,39 @@ const styles = StyleSheet.create({
     backgroundColor: "#F4FBFF",
     padding: 20,
     borderRadius: 20,
-    alignContent:"center",
-    width:"auto"
+    width: "100%",
+    alignSelf: "center",
   },
 
-  // titulo
+  //titulo principal
   title: {
     fontSize: 26,
     color: "#4A90E2",
     marginBottom: 20,
     textAlign: "center",
-    fontFamily: "Pacifico_400Regular", // 🔥 aquí
+    fontFamily: "Pacifico_400Regular",
   },
 
-  // 🧠 INPUTS LIMPIOS
-  input: {
+  //contenedor de cada input con icono
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
-    padding: 14,
-    marginBottom: 12,
     borderWidth: 1,
     borderColor: "#D6ECFF",
-    fontFamily: "Poppins_400Regular", // 🔥 aquí
-    fontSize: 14,
+    marginBottom: 12,
+    paddingHorizontal: 10,
   },
 
-  // 🔘 BOTÓN
+  //input de texto
+  input: {
+    flex: 1,
+    padding: 12,
+    fontFamily: "Poppins_400Regular",
+  },
+
+  //botón principal
   button: {
     backgroundColor: "#6EC6FF",
     padding: 15,
@@ -160,11 +251,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 
-  // 🧾 TEXTO BOTÓN
+  //texto del botón
   buttonText: {
     color: "white",
     textAlign: "center",
-    fontFamily: "Poppins_400Regular", // 🔥 aquí
+    fontFamily: "Poppins_400Regular",
     fontSize: 16,
   },
 });
