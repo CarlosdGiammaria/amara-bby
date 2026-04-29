@@ -8,20 +8,44 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 
 const SingInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const router = useRouter();
+
+  const handleLogin = async () => {
+    //validación basica
     if (!email || !password) {
       Alert.alert("Error", "Completa todos los campos");
       return;
     }
+    try {
+      //Obtener usuario guardado
+      const storedUser = await AsyncStorage.getItem("user")
+      if (!storedUser) {
+        Alert.alert("Error", "No existe usario registrado")
+        return;
+      }
+      // Convertir a objeto
+      const user = JSON.parse(storedUser);
 
-    Alert.alert("Bienvenida 💙", "Inicio de sesión exitoso");
+      //validamos credenciales
+      if (user.email === email && user.password === password) {
+        await AsyncStorage.setItem("isLogged", "true")
+        Alert.alert("Bienvenida 💙", "Inicio de sesión exitoso");
+        router.replace("/home");
+      } else {
+        Alert.alert("Error", "Credenciales incorrectas");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Algo salio mal")
+    }
+
   };
 
   return (
