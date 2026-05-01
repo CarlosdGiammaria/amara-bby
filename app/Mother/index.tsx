@@ -1,4 +1,4 @@
-import SignUpForm from "@/components/SignUpForm";
+import SignUpForm from "@/components/MotherForm";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
@@ -6,12 +6,13 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,View,
-  TouchableOpacity
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const RegisterPage = () => {
+const MotherPage = () => {
 
 
   return (
@@ -56,7 +57,7 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default MotherPage;
 
 
 const styles = StyleSheet.create({

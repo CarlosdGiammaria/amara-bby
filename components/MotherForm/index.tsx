@@ -13,7 +13,7 @@ import {
 } from "react-native";
 
 //estructura del usuario (modelo de datos)
-interface User {
+interface Mother {
   name: string;
   lastName: string;
   yearOfBirth: string;
@@ -22,10 +22,10 @@ interface User {
   password: string;
 }
 
-const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
+const MotherForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
   //Estado inicial del formulario, todos los campos vacios
-  const initialForm: User = {
+  const initialForm: Mother = {
     name: "",
     lastName: "",
     yearOfBirth: "",
@@ -34,7 +34,7 @@ const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     password: "",
   };
   //estado principal del formulario
-  const [form, setForm] = useState<User>(initialForm);
+  const [form, setForm] = useState<Mother>(initialForm);
   
 
   //controla si se muestra u oculta la contraseña
@@ -47,7 +47,7 @@ const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [date, setDate] = useState(new Date());
 
   //toma los cambios y los almacena en el estado
-  const handleChange = (key: keyof User, value: string) => {
+  const handleChange = (key: keyof Mother, value: string) => {
     setForm({ ...form, [key]: value });
   };
 
@@ -204,7 +204,7 @@ const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   );
 };
 
-export default SignUpForm;
+export default MotherForm;
 
 const styles = StyleSheet.create({
   container: {
