@@ -19,8 +19,7 @@ const MotherPage = () => {
     <SafeAreaView style={styles.Container}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
+        behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView
           contentContainerStyle={{
             flexGrow: 1,
@@ -31,7 +30,7 @@ const MotherPage = () => {
           keyboardShouldPersistTaps="handled"
         >
           <TouchableOpacity
-            onPress={() => router.replace("/login")}
+            onPress={() => router.replace("/home")}
             style={styles.buttonBack}
           >
             <View style={{
@@ -49,10 +48,10 @@ const MotherPage = () => {
               </Text>
             </View>
           </TouchableOpacity>
-          <SignUpForm />
 
         </ScrollView>
       </KeyboardAvoidingView>
+          <SignUpForm />
     </SafeAreaView>
   );
 };

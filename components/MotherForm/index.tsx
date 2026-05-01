@@ -79,7 +79,7 @@ const MotherForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
     //maneja el guardado de datos en AsyncStorage
     try {
-      await AsyncStorage.setItem("user", JSON.stringify(form));
+      await AsyncStorage.setItem("mother", JSON.stringify(form));
 
       Alert.alert("💙 Registro exitoso", "Bienvenida a Amara Baby");
       setForm(initialForm)
