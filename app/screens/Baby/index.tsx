@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { Modal, StyleSheet, View } from "react-native";
 
-const BabyPage = () => {
+const BabyScreen = () => {
 
   const [visible, setVisible] = useState(false);
 
@@ -40,7 +40,7 @@ const BabyPage = () => {
   );
 };
 
-export default BabyPage;
+export default BabyScreen;
 
 const styles = StyleSheet.create({
   overlay: {

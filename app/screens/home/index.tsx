@@ -1,10 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import MessageModal from "../../components/Message";
+import MessageModal from "../../../components/Message";
 
-const HomePage = () => {
+const HomeScreen = () => {
   const [showModal, setShowModal] = useState(false);
   const [dataMother, setDataMother] = useState("");
 
@@ -30,7 +29,7 @@ const HomePage = () => {
   // 👉 Ir al formulario
   const handleContinue = () => {
     setShowModal(false);
-    router.push("/Mother"); // ajusta si tu ruta es diferente
+   /*  router.push("/Mother"); */ // ajusta si tu ruta es diferente
   };
 
   // 👉 "Más tarde" solo cierra el modal (sin guardar nada)
@@ -45,7 +44,7 @@ const HomePage = () => {
       <Text>Hola, bienvanida {dataMother}</Text>
       <Text>¿Deseas Registrar a tus bebes?</Text>
 
-      <TouchableOpacity onPress={() => router.replace("/Baby")}>
+      <TouchableOpacity onPress={() => alert('hola')}>
         <Text>Registrar Bebes</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => AsyncStorage.clear()}>
@@ -61,4 +60,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default HomeScreen;

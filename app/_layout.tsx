@@ -36,7 +36,7 @@ const RootLayout = () => {
       <Stack
         screenOptions={{
           headerShown: false,
-          animation: "fade_from_bottom", // 💙 AQUÍ ESTÁ LA MAGIA
+          animation: "fade_from_bottom",
         }}
       />
       <StatusBar style="dark" />

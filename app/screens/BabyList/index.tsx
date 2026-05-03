@@ -2,7 +2,7 @@ import type { Baby } from '@/types/baby';
 import { deleteBaby, getBabies, setActiveBaby } from "@/utils/babyStorage";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-const BabyListPage = () => {
+const BabyListScreen = () => {
 
   const [babies, setBabies] = useState<Baby[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -61,7 +61,7 @@ const BabyListPage = () => {
   );
 };
 
-export default BabyListPage;
+export default BabyListScreen;
 
 const styles = StyleSheet.create({
   title: {

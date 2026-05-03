@@ -1,6 +1,5 @@
 import SignUpForm from "@/components/MotherForm";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -12,7 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const MotherPage = () => {
+const MotherScreen = () => {
 
   return (
     <SafeAreaView style={styles.Container}>
@@ -27,7 +26,7 @@ const MotherPage = () => {
 
           {/* Botón volver */}
           <TouchableOpacity
-            onPress={() => router.replace("/home")}
+            /* onPress={() => router.replace("/home")} */
             style={styles.buttonBack}
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -47,7 +46,7 @@ const MotherPage = () => {
   );
 };
 
-export default MotherPage;
+export default MotherScreen;
 
 const styles = StyleSheet.create({
   Container: {

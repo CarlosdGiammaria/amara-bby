@@ -1,7 +1,6 @@
 import type { Baby } from '@/types/baby';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -143,9 +142,9 @@ const BabyForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         onPress={async () => {
           const success = await handleRegister();
 
-          if (success) {
+          /* if (success) {
             router.replace("/BabyList/BabyListPage");
-          }
+          } */
         }}
       >
         <Text style={styles.buttonText}>Guardar</Text>

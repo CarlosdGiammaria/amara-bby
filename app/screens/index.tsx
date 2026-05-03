@@ -1,0 +1,14 @@
+import { Text, View } from "react-native";
+/* import HomePage from "./home"; */
+
+
+const ContainerApp = () => {
+  return (
+    <View style={{ flex: 1 }}>
+      {/* <HomePage /> */}
+      <Text>Hola</Text>
+    </View>
+  );
+};
+
+export default ContainerApp;
