@@ -1,5 +1,7 @@
-import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { Baby } from '@/types/baby';
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -9,57 +11,63 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { addBaby } from "../../utils/babyStorage";
 
-//estructura del usuario (modelo de datos)
-interface Baby {
-  name: string;
-  age: string
-  weight?: string;
-}
+
+// 🧾 modelo del formulario (UI)
+type BabyFormType = Omit<Baby, "id" | "motherId">;
 
 const BabyForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
-  //Estado inicial del formulario, todos los campos vacios
-  const initialForm: Baby = {
+  // 🧩 estado inicial (solo UI)
+  const initialForm: BabyFormType = {
     name: "",
-    age: "",
-    weight: ""
+    ageValue: "",
+    ageUnit: "mes(es)",
+    weightValue: "",
+    weightUnit: "kg",
   };
 
-  //estado principal del formulario
-  const [form, setForm] = useState<Baby>(initialForm);
+  const [form, setForm] = useState<BabyFormType>(initialForm);
 
+  // 🔢 solo números
+  const onlyNumbers = (text: string) => text.replace(/[^0-9.]/g, "");
 
-  //toma los cambios y los almacena en el estado
-  const handleChange = (key: keyof Baby, value: string) => {
+  // 🔄 cambios
+  const handleChange = (key: keyof BabyFormType, value: string) => {
     setForm({ ...form, [key]: value });
   };
 
-  //convierte a numero los campos como telefono
-  const onlyNumbers = (text: string) => text.replace(/[^0-9]/g, "");
-
-
+  // 💾 guardar bebé
   const handleRegister = async () => {
-
-    //valida que los campos obligatorios no estén vacíos
-    if (!form.name || !form.age || !form.weight) {
+    if (!form.name || !form.ageValue || !form.weightValue) {
       Alert.alert("Error", "Completa los campos obligatorios");
-      return;
+      return false;
     }
 
-    //maneja el guardado de datos en AsyncStorage
-    try {
-      await AsyncStorage.setItem("baby", JSON.stringify(form));
+    // 🔥 obtener madre
+    const motherData = await AsyncStorage.getItem("mother");
 
-      Alert.alert("💙 Registro exitoso");
-      setForm(initialForm)
-
-      //callback opcional para refrescar datos en la pantalla padre
-      onSuccess?.();
-
-    } catch (error) {
-      Alert.alert("Error", "No se pudo guardar el los datos del bebé");
+    if (!motherData) {
+      Alert.alert("Error", "No hay madre registrada");
+      return false;
     }
+
+    const mother = JSON.parse(motherData);
+
+    const newBaby: Baby = {
+      ...form,
+      id: Date.now().toString(),
+      motherId: mother.id, // ✅ AQUÍ ESTÁ LA CLAVE
+    };
+
+    await addBaby(newBaby);
+
+    Alert.alert("💙 Bebé registrado");
+    setForm(initialForm);
+    onSuccess?.();
+
+    return true;
   };
 
   return (
@@ -67,9 +75,9 @@ const BabyForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
       <Text style={styles.title}>Registro de Bebé</Text>
 
-      {/* Nombre */}
+      {/* 🍼 Nombre */}
       <View style={styles.inputContainer}>
-        <Ionicons name="person-outline" size={20} color="#4A90E2" />
+        <FontAwesome5 name="baby" size={20} color="#4A90E2" />
         <TextInput
           placeholder="Nombre"
           value={form.name}
@@ -78,34 +86,70 @@ const BabyForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         />
       </View>
 
-      {/* Edad */}
+      {/* 📅 Edad */}
       <View style={styles.inputContainer}>
-        <Ionicons name="person-outline" size={20} color="#4A90E2" />
+        <FontAwesome name="calendar" size={20} color="#4A90E2" />
+
         <TextInput
           placeholder="Edad"
-          value={form.age}
-          onChangeText={(text) => handleChange("age", text)}
+          value={form.ageValue}
+          keyboardType="numeric"
+          onChangeText={(text) => handleChange("ageValue", onlyNumbers(text))}
           style={styles.input}
         />
+
+        <TouchableOpacity
+          onPress={() => {
+            const next = {
+              "dia(s)": "semana(s)",
+              "semana(s)": "mes(es)",
+              "mes(es)": "año(s)",
+              "año(s)": "dia(s)",
+            }[form.ageUnit];
+
+            handleChange("ageUnit", next as BabyFormType["ageUnit"]);
+          }}
+        >
+          <Text style={styles.unit}>{form.ageUnit}</Text>
+        </TouchableOpacity>
+
       </View>
 
-        {/* peso */}
+      {/* ⚖️ Peso */}
       <View style={styles.inputContainer}>
-        <Ionicons name="person-outline" size={20} color="#4A90E2" />
+        <FontAwesome5 name="weight" size={20} color="#4A90E2" />
+
         <TextInput
           placeholder="Peso"
-          value={form.weight}
-          onChangeText={(text) => handleChange("weight", text)}
+          value={form.weightValue}
+          keyboardType="numeric"
+          onChangeText={(text) => handleChange("weightValue", onlyNumbers(text))}
           style={styles.input}
         />
+
+        <TouchableOpacity
+          onPress={() => {
+            const next = form.weightUnit === "kg" ? "lb" : "kg";
+            handleChange("weightUnit", next);
+          }}
+        >
+          <Text style={styles.unit}>{form.weightUnit}</Text>
+        </TouchableOpacity>
       </View>
 
+      {/* 🚀 Botón */}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={async () => {
+          const success = await handleRegister();
 
-      {/* Botón de registro */}
-      <TouchableOpacity onPress={handleRegister} style={styles.button}>
+          if (success) {
+            router.replace("/BabyList/BabyListPage");
+          }
+        }}
+      >
         <Text style={styles.buttonText}>Guardar</Text>
       </TouchableOpacity>
-
 
     </View>
   );
@@ -122,7 +166,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
 
-  //titulo principal
   title: {
     fontSize: 26,
     color: "#4A90E2",
@@ -131,7 +174,6 @@ const styles = StyleSheet.create({
     fontFamily: "Pacifico_400Regular",
   },
 
-  //contenedor de cada input con icono
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -143,14 +185,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 
-  //input de texto
   input: {
     flex: 1,
     padding: 12,
     fontFamily: "Poppins_400Regular",
   },
 
-  //botón principal
+  unit: {
+    marginLeft: 10,
+    fontWeight: "bold",
+    color: "#4A90E2",
+  },
+
   button: {
     backgroundColor: "#6EC6FF",
     padding: 15,
@@ -158,7 +204,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 
-  //texto del botón
   buttonText: {
     color: "white",
     textAlign: "center",

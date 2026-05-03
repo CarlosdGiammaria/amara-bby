@@ -1,39 +1,57 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import MessageModal from "../../components/Message";
 
 const HomePage = () => {
-
   const [showModal, setShowModal] = useState(false);
+  const [dataMother, setDataMother] = useState("");
 
   const checkMother = async () => {
     const mother = await AsyncStorage.getItem("mother");
-    const skipped = await AsyncStorage.getItem("skipOnboarding");
-
-    if (!mother && !skipped) {
+    console.log("mother:", mother);
+    // 🔥 SOLO validamos mother (más limpio y correcto)
+    if (!mother) {
       setShowModal(true);
     }
+
+    //consulta el nombre de la madre
+    if (!mother) return
+    const motherName = JSON.parse(mother)
+    setDataMother(motherName.name)
+
   };
 
   useEffect(() => {
     checkMother();
   }, []);
 
+  // 👉 Ir al formulario
   const handleContinue = () => {
     setShowModal(false);
-    router.push("/Mother");
+    router.push("/Mother"); // ajusta si tu ruta es diferente
   };
 
-  const handleLater = async () => {
-    await AsyncStorage.setItem("skipOnboarding", "true");
+  // 👉 "Más tarde" solo cierra el modal (sin guardar nada)
+  const handleLater = () => {
     setShowModal(false);
   };
 
   return (
-    <View style={{ flex: 1, justifyContent:"center", alignItems:"center" }}>
-      <Text>Holaaa</Text>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+
+      <Text>Home Page</Text>
+      <Text>Hola, bienvanida {dataMother}</Text>
+      <Text>¿Deseas Registrar a tus bebes?</Text>
+
+      <TouchableOpacity onPress={() => router.replace("/Baby")}>
+        <Text>Registrar Bebes</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => AsyncStorage.clear()}>
+        <Text>Eliminar Data</Text>
+      </TouchableOpacity>
+
       <MessageModal
         visible={showModal}
         onContinue={handleContinue}

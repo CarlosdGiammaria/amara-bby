@@ -1,3 +1,4 @@
+import type { Mother } from '@/types/mother';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -12,79 +13,87 @@ import {
   View
 } from "react-native";
 
-//estructura del usuario (modelo de datos)
-interface Mother {
-  name: string;
-  lastName: string;
-  yearOfBirth: string;
-  phone: string;
-  email: string;
-  password: string;
-}
-
 const MotherForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
-  //Estado inicial del formulario, todos los campos vacios
+  // 🧾 Estado inicial
   const initialForm: Mother = {
+    id: "",
     name: "",
     lastName: "",
     yearOfBirth: "",
     phone: "",
-    email: "",
-    password: "",
   };
-  //estado principal del formulario
+
+  // 📌 Estado del formulario
   const [form, setForm] = useState<Mother>(initialForm);
-  
 
-  //controla si se muestra u oculta la contraseña
-  const [showPassword, setShowPassword] = useState(false);
+  // ❌ Estado de errores (para validación visual)
+  const [errors, setErrors] = useState<Partial<Mother>>({});
 
-  //controla la visibilidad del calendario
+
+  // 📅 Control del date picker
   const [showDatePicker, setShowDatePicker] = useState(false);
-
-  //guarda temporalmente la fecha seleccionada
   const [date, setDate] = useState(new Date());
 
-  //toma los cambios y los almacena en el estado
+  // ✏️ Manejo de cambios + limpiar errores en tiempo real
   const handleChange = (key: keyof Mother, value: string) => {
     setForm({ ...form, [key]: value });
+
+    // 🔥 Limpia el error del campo mientras escribe
+    if (errors[key]) {
+      setErrors({ ...errors, [key]: "" });
+    }
   };
 
-  //convierte a numero los campos como telefono
+  // ✅ Validación completa
+  const validate = () => {
+    const newErrors: Partial<Mother> = {};
+
+    if (!form.name) newErrors.name = "El nombre es obligatorio";
+    if (!form.lastName) newErrors.lastName = "El apellido es obligatorio";
+    if (!form.yearOfBirth) newErrors.yearOfBirth = "Fecha obligatoria";
+    if (!form.phone) newErrors.phone = "Teléfono obligatorio";
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // 🔢 Solo números
   const onlyNumbers = (text: string) => text.replace(/[^0-9]/g, "");
 
-  //maneja el cambio de fecha desde el calendario
+  // 📅 Manejo del calendario
   const onChangeDate = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(false); //cierra el calendario
+    setShowDatePicker(false);
 
     if (selectedDate) {
       setDate(selectedDate);
 
-      //formatea la fecha a YYYY-MM-DD
       const formatted = selectedDate.toISOString().split("T")[0];
 
-      //guarda la fecha en el formulario
       handleChange("yearOfBirth", formatted);
     }
   };
 
+  // 🚀 Registro
   const handleRegister = async () => {
 
-    //valida que los campos obligatorios no estén vacíos
-    if (!form.name || !form.email || !form.password) {
-      Alert.alert("Error", "Completa los campos obligatorios");
-      return;
-    }
+    // ❗ Usa SOLO validate (no duplicar lógica)
+    if (!validate()) return;
 
-    //maneja el guardado de datos en AsyncStorage
     try {
-      await AsyncStorage.setItem("mother", JSON.stringify(form));
+      const newMother: Mother = {
+        ...form,
+        id: Date.now().toString(), // 🔥 AQUÍ CREAS EL ID
+      };
+
+      await AsyncStorage.setItem("mother", JSON.stringify(newMother));
 
       Alert.alert("💙 Registro exitoso", "Bienvenida a Amara Baby");
-      setForm(initialForm)
 
-      //callback opcional para refrescar datos en la pantalla padre
+      setForm(initialForm);
+      setErrors({});
+
       onSuccess?.();
 
     } catch (error) {
@@ -95,10 +104,10 @@ const MotherForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>Crear cuenta</Text>
+      <Text style={styles.title}>Registrar Datos</Text>
 
-      {/* Nombre */}
-      <View style={styles.inputContainer}>
+      {/* 🔹 Nombre */}
+      <View style={[styles.inputContainer, errors.name && styles.inputError]}>
         <Ionicons name="person-outline" size={20} color="#4A90E2" />
         <TextInput
           placeholder="Nombre"
@@ -107,9 +116,10 @@ const MotherForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           style={styles.input}
         />
       </View>
+      {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
-      {/* Apellido */}
-      <View style={styles.inputContainer}>
+      {/* 🔹 Apellido */}
+      <View style={[styles.inputContainer, errors.lastName && styles.inputError]}>
         <Ionicons name="person-outline" size={20} color="#4A90E2" />
         <TextInput
           placeholder="Apellido"
@@ -118,29 +128,22 @@ const MotherForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           style={styles.input}
         />
       </View>
+      {errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
 
-      {/* Fecha con calendario */}
-      <View style={styles.inputContainer}>
+      {/* 🔹 Fecha */}
+      <View style={[styles.inputContainer, errors.yearOfBirth && styles.inputError]}>
         <Ionicons name="calendar-outline" size={20} color="#4A90E2" />
 
-        {/* este Touchable abre el calendario */}
-        <TouchableOpacity
-          style={{ flex: 1, padding: 12 }}
-          onPress={() => setShowDatePicker(true)}
-        >
-          <Text
-            style={{
-              fontFamily: "Poppins_400Regular",
-              color: form.yearOfBirth ? "#000" : "#999",
-            }}
-          >
+        <TouchableOpacity style={{ flex: 1, padding: 12 }} onPress={() => setShowDatePicker(true)}>
+          <Text style={{ color: form.yearOfBirth ? "#000" : "#999" }}>
             {form.yearOfBirth || "Fecha de nacimiento"}
           </Text>
         </TouchableOpacity>
       </View>
+      {errors.yearOfBirth && <Text style={styles.errorText}>{errors.yearOfBirth}</Text>}
 
-      {/* Teléfono */}
-      <View style={styles.inputContainer}>
+      {/* 🔹 Teléfono */}
+      <View style={[styles.inputContainer, errors.phone && styles.inputError]}>
         <Ionicons name="call-outline" size={20} color="#4A90E2" />
         <TextInput
           placeholder="Teléfono"
@@ -150,53 +153,22 @@ const MotherForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           style={styles.input}
         />
       </View>
+      {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
 
-      {/* Email */}
-      <View style={styles.inputContainer}>
-        <Ionicons name="mail-outline" size={20} color="#4A90E2" />
-        <TextInput
-          placeholder="Correo"
-          value={form.email}
-          onChangeText={(text) => handleChange("email", text)}
-          style={styles.input}
-        />
-      </View>
 
-      {/* Password */}
-      <View style={styles.inputContainer}>
-        <Ionicons name="lock-closed-outline" size={20} color="#4A90E2" />
-
-        <TextInput
-          placeholder="Contraseña"
-          secureTextEntry={!showPassword}
-          value={form.password}
-          onChangeText={(text) => handleChange("password", text)}
-          style={styles.input}
-        />
-
-        {/* botón para mostrar/ocultar contraseña */}
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <Ionicons
-            name={showPassword ? "eye-off" : "eye"}
-            size={20}
-            color="#4A90E2"
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* Botón de registro */}
+      {/* 🔘 Botón */}
       <TouchableOpacity onPress={handleRegister} style={styles.button}>
         <Text style={styles.buttonText}>Registrarme</Text>
       </TouchableOpacity>
 
-      {/* componente de calendario */}
+      {/* 📅 DatePicker */}
       {showDatePicker && (
         <DateTimePicker
           value={date}
           mode="date"
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={onChangeDate}
-          maximumDate={new Date()} //evita fechas futuras
+          maximumDate={new Date()}
         />
       )}
 
@@ -212,38 +184,47 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     width: "100%",
-    alignSelf: "center",
   },
 
-  //titulo principal
   title: {
     fontSize: 26,
     color: "#4A90E2",
     marginBottom: 20,
     textAlign: "center",
     fontFamily: "Pacifico_400Regular",
+
   },
 
-  //contenedor de cada input con icono
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#fff",
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#D6ECFF",
-    marginBottom: 12,
+    marginBottom: 5,
     paddingHorizontal: 10,
   },
 
-  //input de texto
+  // 🔥 borde rojo
+  inputError: {
+    borderColor: "#FF4D4D",
+  },
+
   input: {
     flex: 1,
     padding: 12,
+  },
+
+  // 🔥 texto de error
+  errorText: {
+    color: "#FF4D4D",
+    fontSize: 12,
+    marginBottom: 10,
+    marginLeft: 5,
     fontFamily: "Poppins_400Regular",
   },
 
-  //botón principal
   button: {
     backgroundColor: "#6EC6FF",
     padding: 15,
@@ -251,11 +232,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 
-  //texto del botón
   buttonText: {
     color: "white",
     textAlign: "center",
-    fontFamily: "Poppins_400Regular",
     fontSize: 16,
+    fontFamily: "Poppins_400Regular",
   },
 });

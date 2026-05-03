@@ -41,9 +41,9 @@ const MessageModal = ({ visible, onContinue, onLater }: Props) => {
               <Text style={styles.primaryText}>Completar ahora</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.secondary} onPress={onLater}>
+            {/* <TouchableOpacity style={styles.secondary} onPress={onLater}>
               <Text style={styles.secondaryText}>Más tarde</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
           </View>
 
