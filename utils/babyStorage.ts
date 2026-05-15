@@ -25,6 +25,24 @@ export const deleteBaby = async (id: string) => {
   await AsyncStorage.setItem("babies", JSON.stringify(updated));
 };
 
+export const updateBaby = async (
+  updatedBaby: Baby
+) => {
+
+  const babies = await getBabies();
+
+  const updated = babies.map((baby) =>
+    baby.id === updatedBaby.id
+      ? updatedBaby
+      : baby
+  );
+
+  await AsyncStorage.setItem(
+    "babies",
+    JSON.stringify(updated)
+  );
+};
+
 // 🔹 Seleccionar activo
 export const setActiveBaby = async (baby: Baby) => {
   await AsyncStorage.setItem("activeBaby", JSON.stringify(baby));

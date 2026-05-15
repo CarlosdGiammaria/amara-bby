@@ -19,7 +19,8 @@ const RootLayout = () => {
 
   useEffect(() => {
     if (isAndroid) {
-      NavigationBar.setBackgroundColorAsync('#000');
+      NavigationBar.setBackgroundColorAsync('#F4FBFF');
+      NavigationBar.setButtonStyleAsync("dark");
     }
   }, []);
 

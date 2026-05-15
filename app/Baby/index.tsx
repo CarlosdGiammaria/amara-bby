@@ -23,7 +23,7 @@ const BabyScreen = () => {
     <View style={{ flex: 1 }}>
 
       {/* Aquí va tu app normal detrás */}
-      
+
       <Modal
         visible={visible}
         animationType="slide"

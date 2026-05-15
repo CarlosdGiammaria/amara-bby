@@ -10,13 +10,20 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { addBaby } from "../../utils/babyStorage";
+import { addBaby, updateBaby } from "../../utils/babyStorage";
 
+interface Props {
+  onSuccess?: () => void;
+  initialData?: Baby | null;
+}
 
 // 🧾 modelo del formulario (UI)
 type BabyFormType = Omit<Baby, "id" | "motherId">;
 
-const BabyForm = ({ onSuccess }: { onSuccess?: () => void }) => {
+const BabyForm = ({
+  onSuccess,
+  initialData,
+}: Props) => {
 
   // 🧩 estado inicial (solo UI)
   const initialForm: BabyFormType = {
@@ -27,7 +34,17 @@ const BabyForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     weightUnit: "kg",
   };
 
-  const [form, setForm] = useState<BabyFormType>(initialForm);
+  const [form, setForm] = useState<BabyFormType>(
+    initialData
+      ? {
+        name: initialData.name,
+        ageValue: initialData.ageValue,
+        ageUnit: initialData.ageUnit,
+        weightValue: initialData.weightValue,
+        weightUnit: initialData.weightUnit,
+      }
+      : initialForm
+  );
 
   // 🔢 solo números
   const onlyNumbers = (text: string) => text.replace(/[^0-9.]/g, "");
@@ -39,34 +56,79 @@ const BabyForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
   // 💾 guardar bebé
   const handleRegister = async () => {
+
     if (!form.name || !form.ageValue || !form.weightValue) {
-      Alert.alert("Error", "Completa los campos obligatorios");
+
+      Alert.alert(
+        "Error",
+        "Completa los campos obligatorios"
+      );
+
       return false;
     }
 
-    // 🔥 obtener madre
     const motherData = await AsyncStorage.getItem("mother");
 
     if (!motherData) {
-      Alert.alert("Error", "No hay madre registrada");
+
+      Alert.alert(
+        "Error",
+        "No hay madre registrada"
+      );
+
       return false;
     }
 
     const mother = JSON.parse(motherData);
 
-    const newBaby: Baby = {
-      ...form,
-      id: Date.now().toString(),
-      motherId: mother.id, // ✅ AQUÍ ESTÁ LA CLAVE
-    };
+    try {
 
-    await addBaby(newBaby);
+      // 🔥 EDITAR
+      if (initialData) {
 
-    Alert.alert("💙 Bebé registrado");
-    setForm(initialForm);
-    onSuccess?.();
+        const updatedBaby: Baby = {
+          ...initialData,
+          ...form,
+        };
 
-    return true;
+        await updateBaby(updatedBaby);
+
+        Alert.alert(
+          "💙 Actualizado",
+          "Información actualizada"
+        );
+
+      } else {
+
+        // 🔥 CREAR
+        const newBaby: Baby = {
+          ...form,
+          id: Date.now().toString(),
+          motherId: mother.id,
+        };
+
+        await addBaby(newBaby);
+
+        Alert.alert(
+          "💙 Bebé registrado"
+        );
+      }
+
+      setForm(initialForm);
+
+      onSuccess?.();
+
+      return true;
+
+    } catch (error) {
+
+      Alert.alert(
+        "Error",
+        "No se pudo guardar"
+      );
+
+      return false;
+    }
   };
 
   return (
@@ -139,15 +201,15 @@ const BabyForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       {/* 🚀 Botón */}
       <TouchableOpacity
         style={styles.button}
-        onPress={async () => {
-          const success = await handleRegister();
-
-          /* if (success) {
-            router.replace("/BabyList/BabyListPage");
-          } */
-        }}
+        onPress={handleRegister}
       >
-        <Text style={styles.buttonText}>Guardar</Text>
+
+        <Text style={styles.buttonText}>
+          {initialData
+            ? "Actualizar bebé"
+            : "Guardar bebé"}
+        </Text>
+
       </TouchableOpacity>
 
     </View>

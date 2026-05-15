@@ -1,5 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 
 interface Props {
   visible: boolean;
@@ -7,43 +13,56 @@ interface Props {
   onLater: () => void;
 }
 
+const MessageModal = ({
+  visible,
+  onContinue,
+  onLater
+}: Props) => {
 
-interface Props {
-  visible: boolean;
-  onContinue: () => void;
-  onLater: () => void;
-}
-
-const MessageModal = ({ visible, onContinue, onLater }: Props) => {
   return (
     <Modal
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={() => {}}
+      onRequestClose={onLater}
     >
       <View style={styles.overlay}>
         <View style={styles.modal}>
 
           <View style={styles.iconContainer}>
-            <Ionicons name="information-circle-outline" size={50} color="#4A90E2" />
+            <Ionicons
+              name="information-circle-outline"
+              size={50}
+              color="#4A90E2"
+            />
           </View>
 
           <Text style={styles.title}>¡Bienvenido!</Text>
 
           <Text style={styles.text}>
-            Para ofrecerte una mejor experiencia, por favor completa tus datos.
+            Para ofrecerte una mejor experiencia,
+            por favor completa tus datos.
           </Text>
 
           <View style={styles.buttons}>
 
-            <TouchableOpacity style={styles.primary} onPress={onContinue}>
-              <Text style={styles.primaryText}>Completar ahora</Text>
+            <TouchableOpacity
+              style={styles.primary}
+              onPress={onContinue}
+            >
+              <Text style={styles.primaryText}>
+                Completar ahora
+              </Text>
             </TouchableOpacity>
 
-            {/* <TouchableOpacity style={styles.secondary} onPress={onLater}>
-              <Text style={styles.secondaryText}>Más tarde</Text>
-            </TouchableOpacity> */}
+            <TouchableOpacity
+              style={styles.secondary}
+              onPress={onLater}
+            >
+              <Text style={styles.secondaryText}>
+                Más tarde
+              </Text>
+            </TouchableOpacity>
 
           </View>
 

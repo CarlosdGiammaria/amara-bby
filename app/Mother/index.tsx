@@ -1,6 +1,9 @@
 import SignUpForm from "@/components/MotherForm";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -12,6 +15,18 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const MotherScreen = () => {
+
+  const handleBack = async () => {
+    const mother = await AsyncStorage.getItem("mother");
+    if (mother) {
+      router.replace("/home");
+    } else {
+      Alert.alert(
+        "Acción requerida",
+        "Por favor, completa tus datos antes de volver al inicio."
+      );
+    }
+  };
 
   return (
     <SafeAreaView style={styles.Container}>
@@ -26,7 +41,7 @@ const MotherScreen = () => {
 
           {/* Botón volver */}
           <TouchableOpacity
-            /* onPress={() => router.replace("/home")} */
+            onPress={handleBack}
             style={styles.buttonBack}
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>

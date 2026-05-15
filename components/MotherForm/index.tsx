@@ -2,6 +2,7 @@ import type { Mother } from '@/types/mother';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { router } from 'expo-router';
 import { useState } from "react";
 import {
   Alert,
@@ -15,7 +16,7 @@ import {
 
 const MotherForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
-  // 🧾 Estado inicial
+  // Estado inicial
   const initialForm: Mother = {
     id: "",
     name: "",
@@ -24,28 +25,28 @@ const MotherForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     phone: "",
   };
 
-  // 📌 Estado del formulario
+  //  Estado del formulario
   const [form, setForm] = useState<Mother>(initialForm);
 
-  // ❌ Estado de errores (para validación visual)
+  // Estado de errores (para validación visual)
   const [errors, setErrors] = useState<Partial<Mother>>({});
 
 
-  // 📅 Control del date picker
+  // Control del date picker
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [date, setDate] = useState(new Date());
 
-  // ✏️ Manejo de cambios + limpiar errores en tiempo real
+  //  Manejo de cambios + limpiar errores en tiempo real
   const handleChange = (key: keyof Mother, value: string) => {
     setForm({ ...form, [key]: value });
 
-    // 🔥 Limpia el error del campo mientras escribe
+    // Limpia el error del campo mientras escribe
     if (errors[key]) {
       setErrors({ ...errors, [key]: "" });
     }
   };
 
-  // ✅ Validación completa
+  // Validación completa
   const validate = () => {
     const newErrors: Partial<Mother> = {};
 
@@ -59,10 +60,10 @@ const MotherForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // 🔢 Solo números
+  // Solo números
   const onlyNumbers = (text: string) => text.replace(/[^0-9]/g, "");
 
-  // 📅 Manejo del calendario
+  // Manejo del calendario
   const onChangeDate = (event: any, selectedDate?: Date) => {
     setShowDatePicker(false);
 
@@ -75,10 +76,10 @@ const MotherForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     }
   };
 
-  // 🚀 Registro
+  // Registro
   const handleRegister = async () => {
 
-    // ❗ Usa SOLO validate (no duplicar lógica)
+    // Usa SOLO validate (no duplicar lógica)
     if (!validate()) return;
 
     try {
@@ -94,7 +95,7 @@ const MotherForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       setForm(initialForm);
       setErrors({});
 
-      onSuccess?.();
+      router.replace("/home");
 
     } catch (error) {
       Alert.alert("Error", "No se pudo guardar el usuario");
