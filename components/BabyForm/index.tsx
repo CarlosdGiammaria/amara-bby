@@ -1,6 +1,7 @@
 import type { Baby } from '@/types/baby';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from 'expo-router';
 import { useState } from "react";
 import {
   Alert,
@@ -108,6 +109,8 @@ const BabyForm = ({
         };
 
         await addBaby(newBaby);
+
+        router.replace("/BabyList");
 
         Alert.alert(
           "💙 Bebé registrado"
