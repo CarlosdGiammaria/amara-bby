@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     color: "#333",
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_400Regular",
   },
 
   info: {

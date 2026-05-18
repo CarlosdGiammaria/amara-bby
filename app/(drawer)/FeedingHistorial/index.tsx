@@ -2,8 +2,10 @@ import CustomHeader from "@/components/CustomHeader";
 
 import FeedingCard from "@/components/FeedingCard";
 
+import type { Baby } from "@/types/baby";
 import type { Feeding } from "@/types/feeding";
 
+import { getBabies } from "@/utils/babyStorage";
 import {
     deleteFeeding,
     getFeedings,
@@ -28,17 +30,21 @@ const FeedingHistoryScreen = () => {
     const [feedings, setFeedings] =
         useState<Feeding[]>([]);
 
-    const loadFeedings = async () => {
+    const [babies, setBabies] = useState<Baby[]>([]);
+
+    const loadData = async () => {
 
         const data = await getFeedings();
+        const babiesData = await getBabies();
 
         setFeedings(data);
+        setBabies(babiesData);
     };
 
     useFocusEffect(
         useCallback(() => {
 
-            loadFeedings();
+            loadData();
 
         }, [])
     );
@@ -49,7 +55,7 @@ const FeedingHistoryScreen = () => {
 
         await deleteFeeding(id);
 
-        loadFeedings();
+        loadData();
     };
 
     // 🔥 agrupar por fecha
@@ -101,17 +107,19 @@ const FeedingHistoryScreen = () => {
                             </Text>
 
                             {/* 🍼 cards */}
-                            {items.map((feeding) => (
-
-                                <FeedingCard
-                                    key={feeding.id}
-                                    feeding={feeding}
-                                    onDelete={() =>
-                                        handleDelete(feeding.id)
-                                    }
-                                />
-
-                            ))}
+                            {items.map((feeding) => {
+                                const babyName = babies.find((b) => b.id === feeding.babyId)?.name || "Bebé desconocido";
+                                return (
+                                    <FeedingCard
+                                        key={feeding.id}
+                                        feeding={feeding}
+                                        babyName={babyName}
+                                        onDelete={() =>
+                                            handleDelete(feeding.id)
+                                        }
+                                    />
+                                );
+                            })}
 
                         </View>
                     );
@@ -138,6 +146,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#F4FBFF",
+
     },
 
     date: {

@@ -11,11 +11,13 @@ import {
 
 interface Props {
     feeding: Feeding;
+    babyName?: string;
     onDelete: () => void;
 }
 
 const FeedingCard = ({
     feeding,
+    babyName,
     onDelete,
 }: Props) => {
 
@@ -36,6 +38,12 @@ const FeedingCard = ({
                 </View>
 
                 <View style={{ flex: 1 }}>
+
+                    {babyName && (
+                        <Text style={styles.babyName}>
+                            {babyName}
+                        </Text>
+                    )}
 
                     <Text style={styles.side}>
                         Lado {feeding.side}
@@ -96,7 +104,7 @@ const styles = StyleSheet.create({
         shadowColor: "#000",
         shadowOpacity: 0.05,
         shadowRadius: 10,
-
+        fontFamily: "Poppins_400Regular",
         elevation: 4,
     },
 
@@ -119,10 +127,17 @@ const styles = StyleSheet.create({
         marginRight: 12,
     },
 
+    babyName: {
+        fontSize: 14,
+        color: "#666",
+        fontFamily: "Poppins_400Regular",
+        marginBottom: 2,
+    },
+
     side: {
         fontSize: 16,
         color: "#333",
-        fontFamily: "Poppins_600SemiBold",
+        fontFamily: "Poppins_400Regular",
     },
 
     time: {

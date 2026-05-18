@@ -2,6 +2,7 @@ import type { Feeding } from "@/types/feeding";
 
 import { addFeeding } from "@/utils/feedingStorage";
 
+import type { Baby } from "@/types/baby";
 import { getActiveBaby } from "@/utils/babyStorage";
 
 import {
@@ -12,7 +13,8 @@ import {
     View,
 } from "react-native";
 
-import { useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import FeedingTimer from "../FeedingTimer";
 
 const FeedingForm = () => {
@@ -23,6 +25,18 @@ const FeedingForm = () => {
 
     const [duration, setDuration] =
         useState(10);
+
+    const [activeBaby, setActiveBabyState] = useState<Baby | null>(null);
+
+    useFocusEffect(
+        useCallback(() => {
+            const loadBaby = async () => {
+                const baby = await getActiveBaby();
+                setActiveBabyState(baby);
+            };
+            loadBaby();
+        }, [])
+    );
 
     const handleSave = async () => {
 
@@ -65,6 +79,15 @@ const FeedingForm = () => {
     return (
         <View style={styles.container}>
 
+            {activeBaby ? (
+                <Text style={styles.babyNameTitle}>
+                    Bebé activo: {activeBaby.name}
+                </Text>
+            ) : (
+                <Text style={styles.babyNameTitle}>
+                    Ningún bebé seleccionado
+                </Text>
+            )}
 
             {/* 🍼 lado */}
             <View style={styles.row}>
@@ -79,7 +102,7 @@ const FeedingForm = () => {
                         setSide("Izquierdo")
                     }
                 >
-                    <Text>
+                    <Text style={styles.sideButtonText}>
                         Izquierdo
                     </Text>
                 </TouchableOpacity>
@@ -94,7 +117,7 @@ const FeedingForm = () => {
                         setSide("Derecho")
                     }
                 >
-                    <Text>
+                    <Text style={styles.sideButtonText}>
                         Derecho
                     </Text>
                 </TouchableOpacity>
@@ -102,7 +125,7 @@ const FeedingForm = () => {
             </View>
 
             {/* ⏱️ duración */}
-            <View style={styles.durationRow}>
+            {/* <View style={styles.durationRow}>
 
                 <TouchableOpacity
                     onPress={() =>
@@ -130,7 +153,7 @@ const FeedingForm = () => {
                     </Text>
                 </TouchableOpacity>
 
-            </View>
+            </View> */}
 
             <FeedingTimer
                 onChange={(seconds) =>
@@ -168,6 +191,18 @@ const styles = StyleSheet.create({
         fontFamily: "Pacifico_400Regular",
     },
 
+    babyNameTitle: {
+        fontSize: 18,
+        color: "#333",
+        textAlign: "center",
+        marginBottom: 15,
+        fontFamily: "Poppins_400Regular",
+    },
+
+    sideButtonText: {
+        fontFamily: "Poppins_400Regular",
+    },
+
     row: {
         flexDirection: "row",
         gap: 10,
@@ -180,6 +215,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#EAF6FF",
         borderRadius: 14,
         alignItems: "center",
+        fontFamily: "Poppins_400Regular",
     },
 
     active: {
@@ -201,7 +237,7 @@ const styles = StyleSheet.create({
 
     duration: {
         fontSize: 22,
-        fontFamily: "Poppins_500Medium",
+        fontFamily: "Poppins_400Regular",
     },
 
     button: {
@@ -214,5 +250,6 @@ const styles = StyleSheet.create({
         color: "#fff",
         textAlign: "center",
         fontSize: 16,
+        fontFamily: "Poppins_400Regular",
     },
 });
